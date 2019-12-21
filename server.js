@@ -1,19 +1,24 @@
 'use strict';
 
-var express     = require('express');
-var bodyParser  = require('body-parser');
-var expect      = require('chai').expect;
-var cors        = require('cors');
+var express = require('express');
+var bodyParser = require('body-parser');
+var expect = require('chai').expect;
+var cors = require('cors');
 
-var apiRoutes         = require('./routes/api.js');
-var fccTestingRoutes  = require('./routes/fcctesting.js');
-var runner            = require('./test-runner');
+var apiRoutes = require('./routes/api.js');
+var fccTestingRoutes = require('./routes/fcctesting.js');
+var runner = require('./test-runner');
+var helmet = require('helmet');
+var dotenv = require('dotenv');
+var mongoose = require('mongoose');
 
+
+dotenv.config();
 var app = express();
-
+app.use(helmet());
 app.use('/public', express.static(process.cwd() + '/public'));
 
-app.use(cors({origin: '*'})); //For FCC testing purposes only
+app.use(cors({ origin: '*' })); //For FCC testing purposes only
 
 
 
@@ -36,30 +41,38 @@ app.route('/')
 fccTestingRoutes(app);
 
 //Routing for API 
-apiRoutes(app);  
-    
+apiRoutes(app);
+
 //404 Not Found Middleware
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.status(404)
     .type('text')
     .send('Not Found');
 });
 
-//Start our server and tests!
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Listening on port " + process.env.PORT);
-  if(process.env.NODE_ENV==='test') {
-    console.log('Running Tests...');
-    setTimeout(function () {
-      try {
-        runner.run();
-      } catch(e) {
-        var error = e;
-          console.log('Tests are not valid:');
-          console.log(error);
+mongoose.connect(process.env.MONGO_DB, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => {
+    app.listen(process.env.PORT || 3000, function () {
+      console.log("Listening on port " + process.env.PORT);
+      if (process.env.NODE_ENV === 'test') {
+        console.log('Running Tests...');
+        setTimeout(function () {
+          try {
+            runner.run();
+          } catch (e) {
+            var error = e;
+            console.log('Tests are not valid:');
+            console.log(error);
+          }
+        }, 3500);
       }
-    }, 3500);
-  }
-});
+    });
+  })
+  .catch(err => { console.log(err) });
+
+//Start our server and tests!
 
 module.exports = app; //for testing

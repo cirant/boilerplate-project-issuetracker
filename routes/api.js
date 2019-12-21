@@ -11,6 +11,7 @@
 var expect = require('chai').expect;
 var MongoClient = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
+var projectController = require('../controller/project');
 
 const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
 
@@ -23,10 +24,7 @@ module.exports = function (app) {
       
     })
     
-    .post(function (req, res){
-      var project = req.params.project;
-      
-    })
+    .post(projectController.create)
     
     .put(function (req, res){
       var project = req.params.project;
