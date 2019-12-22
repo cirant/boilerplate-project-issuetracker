@@ -52,7 +52,8 @@ app.use(function (req, res, next) {
 
 mongoose.connect(process.env.MONGO_DB, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 })
   .then(() => {
     app.listen(process.env.PORT || 3000, function () {
