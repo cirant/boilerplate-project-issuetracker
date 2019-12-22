@@ -7,6 +7,11 @@ exports.create = async (req, res, next) => {
 		var projectName = req.params.project;
 		const { issue_title, issue_text, created_by, assigned_to, status_text } = req.body;
 
+		[issue_title, issue_text, created_by].forEach((el) => {
+			if (el === undefined || el === null || el.trim() === '')
+				throw new Error(`issue_title, issue_text and created_by are required`)
+		});
+
 		Project.findOrCreate({ name: projectName }, (err, project) => {
 			if (err) {
 				next(new Error(err));
@@ -29,7 +34,7 @@ exports.create = async (req, res, next) => {
 			});
 		});
 	} catch (error) {
-		next(error);
+		return res.status(400).send(error.message)
 	}
 }
 
