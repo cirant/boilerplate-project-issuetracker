@@ -20,7 +20,7 @@ suite('Functional Tests', function () {
   let issusId;
 
   this.beforeAll(done => {
-    mongoose.connect(process.env.MONGO_DB_TEST, {
+    mongoose.connect(process.env.MONGO_DB_TEST || process.env.MONGO_DB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false
